@@ -1,13 +1,12 @@
 package org.schoolsorokin.javacore;
 
-/**
- * Hello world!
- *
- */
+import org.schoolsorokin.javacore.basics.VariablesAndDataTypes;
+
 public class App 
 {
     public static void main( String[] args )
     {
-        System.out.println( "Hello World!" );
+        VariablesAndDataTypes variables = new VariablesAndDataTypes();
+        variables.variables();
     }
 }
