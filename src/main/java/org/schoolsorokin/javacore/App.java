@@ -1,6 +1,7 @@
 package org.schoolsorokin.javacore;
 
 import org.schoolsorokin.javacore.basics.AnalysisOfRatings;
+import org.schoolsorokin.javacore.basics.HomeworkOnArrays;
 import org.schoolsorokin.javacore.basics.HomeworkOnCycles;
 import org.schoolsorokin.javacore.basics.MovieSelection;
 
@@ -16,5 +17,8 @@ public class App
 
         HomeworkOnCycles cycles = new HomeworkOnCycles();
         cycles.cycles();
+
+        HomeworkOnArrays arrays = new HomeworkOnArrays();
+        arrays.arrays();
     }
 }
