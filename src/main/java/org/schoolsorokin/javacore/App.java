@@ -1,6 +1,7 @@
 package org.schoolsorokin.javacore;
 
 import org.schoolsorokin.javacore.basics.AnalysisOfRatings;
+import org.schoolsorokin.javacore.basics.HomeworkOnCycles;
 import org.schoolsorokin.javacore.basics.MovieSelection;
 
 public class App 
@@ -12,5 +13,8 @@ public class App
 
         MovieSelection selection = new MovieSelection();
         selection.movie();
+
+        HomeworkOnCycles cycles = new HomeworkOnCycles();
+        cycles.cycles();
     }
 }
