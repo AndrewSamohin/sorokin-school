@@ -1,13 +1,24 @@
 package org.schoolsorokin.javacore;
 
-/**
- * Hello world!
- *
- */
+import org.schoolsorokin.javacore.basics.*;
+
 public class App 
 {
     public static void main( String[] args )
     {
-        System.out.println( "Hello World!" );
+        /*AnalysisOfRatings analysis = new AnalysisOfRatings();
+        analysis.analysis();
+
+        MovieSelection selection = new MovieSelection();
+        selection.movie();
+
+        HomeworkOnCycles cycles = new HomeworkOnCycles();
+        cycles.cycles();
+
+        HomeworkOnArrays arrays = new HomeworkOnArrays();
+        arrays.arrays();*/
+
+        WorkingWithStrings strings = new WorkingWithStrings();
+        strings.strings();
     }
 }
