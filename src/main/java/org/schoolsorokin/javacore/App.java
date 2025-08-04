@@ -1,15 +1,12 @@
 package org.schoolsorokin.javacore;
 
-import org.schoolsorokin.javacore.basics.AnalysisOfRatings;
-import org.schoolsorokin.javacore.basics.HomeworkOnArrays;
-import org.schoolsorokin.javacore.basics.HomeworkOnCycles;
-import org.schoolsorokin.javacore.basics.MovieSelection;
+import org.schoolsorokin.javacore.basics.*;
 
 public class App 
 {
     public static void main( String[] args )
     {
-        AnalysisOfRatings analysis = new AnalysisOfRatings();
+        /*AnalysisOfRatings analysis = new AnalysisOfRatings();
         analysis.analysis();
 
         MovieSelection selection = new MovieSelection();
@@ -19,6 +16,9 @@ public class App
         cycles.cycles();
 
         HomeworkOnArrays arrays = new HomeworkOnArrays();
-        arrays.arrays();
+        arrays.arrays();*/
+
+        WorkingWithStrings strings = new WorkingWithStrings();
+        strings.strings();
     }
 }
