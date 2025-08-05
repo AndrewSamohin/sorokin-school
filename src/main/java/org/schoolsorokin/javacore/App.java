@@ -16,9 +16,12 @@ public class App
         cycles.cycles();
 
         HomeworkOnArrays arrays = new HomeworkOnArrays();
-        arrays.arrays();*/
+        arrays.arrays();
 
         WorkingWithStrings strings = new WorkingWithStrings();
-        strings.strings();
+        strings.strings();*/
+
+        ContactAccountingSystem system = new ContactAccountingSystem();
+        system.accountSystem();
     }
 }
