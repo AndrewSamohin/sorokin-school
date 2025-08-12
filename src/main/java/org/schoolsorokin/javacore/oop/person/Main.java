@@ -1,4 +1,4 @@
-package org.schoolsorokin.javacore.oop;
+package org.schoolsorokin.javacore.oop.person;
 
 public class Main {
 

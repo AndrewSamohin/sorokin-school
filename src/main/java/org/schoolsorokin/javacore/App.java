@@ -1,7 +1,6 @@
 package org.schoolsorokin.javacore;
 
-import org.schoolsorokin.javacore.oop.Book;
-import org.schoolsorokin.javacore.oop.Main;
+import org.schoolsorokin.javacore.oop.person.Main;
 
 /**
  * Hello world!
