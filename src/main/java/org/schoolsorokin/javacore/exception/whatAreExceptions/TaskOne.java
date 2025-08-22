@@ -2,7 +2,7 @@ package org.schoolsorokin.javacore.exception.whatAreExceptions;
 
 import java.util.Scanner;
 
-public class taskOne {
+public class TaskOne {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         System.out.println("Напишите два числа: ");
