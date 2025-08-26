@@ -34,13 +34,11 @@ public class Main {
                         System.out.println("Enter the ISBN: ");
                         String ISBN = sc.nextLine();
                         library.addPublication(new Book(title, author, year, ISBN));
-                    }
-                    else if (type == 2) {
+                    } else if (type == 2) {
                         System.out.println("Enter the issue number: ");
                         int issueNumber = sc.nextInt();
                         library.addPublication(new Magazine(title, author, year, issueNumber));
-                    }
-                    else if (type == 3) {
+                    } else if (type == 3) {
                         System.out.println("Enter the publication day: ");
                         String publicationDay = sc.nextLine();
                         library.addPublication(new Newspaper(title, author, year, publicationDay));
@@ -71,10 +69,11 @@ public class Main {
             }
         }
     }
+
     //Метод для вывода соновного меню
     public static void displayMenu() {
         System.out.println(
-                        "Option 1. Add a new publication. " +
+                "Option 1. Add a new publication. " +
                         "\nOption 2. Display a list of all publications. " +
                         "\nOption 3. Search for publication by author." +
                         "\nOption 4. Display the total number of publications. " +

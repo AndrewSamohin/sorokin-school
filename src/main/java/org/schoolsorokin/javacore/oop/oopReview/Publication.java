@@ -2,7 +2,7 @@ package org.schoolsorokin.javacore.oop.oopReview;
 
 import java.util.Objects;
 
-public abstract class Publication {
+public abstract class Publication implements Printable {
 
     private String title;
     private String author;
@@ -18,6 +18,13 @@ public abstract class Publication {
 
     public static void increasePublicationCount() {
         getPublicationCount++;
+    }
+
+    @Override
+    public void printDetails() {
+        System.out.println("Publication: title = " + title +
+                ", author = " + author +
+                ", year = " + year + ".");
     }
 
     @Override

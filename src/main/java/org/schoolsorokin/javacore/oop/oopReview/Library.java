@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Library {
 
-    private List<Publication> publications;
+    private final List<Publication> publications;
 
     public Library() {
         publications = new ArrayList<>();
@@ -13,6 +13,11 @@ public class Library {
 
     //Добавление публикации в каталог
     public void addPublication(Publication pub) {
+        if (pub.getTitle() == null || pub.getTitle().trim().isEmpty()
+                || pub.getAuthor() == null || pub.getAuthor().trim().isEmpty()) {
+            System.out.println("Cannot add publication with empty title or author");
+            return;
+        }
         publications.add(pub);
         Publication.increasePublicationCount();
         System.out.println("Publication added");
@@ -21,7 +26,7 @@ public class Library {
     //Вывод всех публикаций
     public void listPublications() {
         for (Publication pub : publications) {
-            System.out.println(pub);
+            pub.printDetails();
         }
     }
 
@@ -30,15 +35,7 @@ public class Library {
         for (Publication pub : publications) {
             if (pub.getAuthor().equalsIgnoreCase(author)) {
                 System.out.println(pub);
-            }
+            } else System.out.println("No publications found for author " + author);
         }
-        System.out.println("No publications found for author " + author);
-    }
-
-    //Удаление публикаций
-    public void deletePublication(Publication pub) {
-        if (publications.remove(pub)) {
-            System.out.println("Publication deleted");
-        } else System.out.println("Publication not found");
     }
 }

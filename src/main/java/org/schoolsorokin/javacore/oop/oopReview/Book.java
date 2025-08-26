@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class Book extends Publication implements Printable{
 
-    private String ISBN;
+    private String isbn;
 
     @Override
     public void printDetails() {
@@ -12,7 +12,7 @@ public class Book extends Publication implements Printable{
                 + "\nTitle: " + getTitle()
                 + "\nAuthor: " + getAuthor()
                 + "\nYear: " + getYear()
-                + "\nISBN: " + ISBN);
+                + "\nISBN: " + isbn);
     }
 
     @Override
@@ -21,7 +21,7 @@ public class Book extends Publication implements Printable{
                 getTitle() + ", author = " +
                 getAuthor() + ", year = " +
                 getYear() + ", ISBN = " +
-                ISBN + ".";
+                isbn + ".";
     }
 
     @Override
@@ -31,19 +31,19 @@ public class Book extends Publication implements Printable{
         if (getClass() != obj.getClass()) return false;
 
         Book other = (Book) obj;
-        return Objects.equals(this.ISBN, other.ISBN) &&
+        return Objects.equals(this.isbn, other.isbn) &&
                 Objects.equals(getTitle(), other.getTitle()) &&
                 Objects.equals(getAuthor(), other.getAuthor());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(ISBN, getTitle(), getAuthor(), getYear());
+        return Objects.hash(isbn, getTitle(), getAuthor(), getYear());
     }
 
     public Book(String title, String author, int year, String ISBN) {
         super(title, author, year);
-        this.ISBN = ISBN;
+        this.isbn = ISBN;
     }
 
     @Override
@@ -52,10 +52,10 @@ public class Book extends Publication implements Printable{
     }
 
     public String getISBN() {
-        return ISBN;
+        return isbn;
     }
 
     public void setISBN(String ISBN) {
-        this.ISBN = ISBN;
+        this.isbn = ISBN;
     }
 }
