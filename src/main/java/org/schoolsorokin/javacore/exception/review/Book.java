@@ -1,44 +1,35 @@
 package org.schoolsorokin.javacore.exception.review;
 
+import org.springframework.util.ObjectUtils;
+
 public class Book {
     private final String title;
     private final String author;
     private int availableCopies;
 
     public Book(String title, String author, int availableCopies) {
-        //Не нравится участок с проверками с помощью if,
-        //но я не знаю, как можно сделать по-другому
+        checkBook();
 
+        this.title = title;
+        this.author = author;
+        this.availableCopies = availableCopies;
+    }
+
+    private void checkBook() {
         //Проверка title
-        if (title == null) {
-            throw new IllegalArgumentException("Название не может быть нулевым.");
-        }
-        //Убераем лишние пробелы для проверки на пустоту
-        String t = title.trim();
-        if (t.isEmpty()) {
+        if (ObjectUtils.isEmpty((title != null) ? title.trim() : null)) {
             throw new IllegalArgumentException("Название не может быть пустым.");
         }
+
         //Проверка author
-        if (author == null) {
-            throw new IllegalArgumentException("Автор не может быть нулевым.");
-        }
-        //Убераем пробелы и проверяем на пустоту
-        String a = author.trim();
-        if (a.isEmpty()) {
+        if (ObjectUtils.isEmpty((author != null) ? author.trim() : null)) {
             throw new IllegalArgumentException("Автор не может быть пустым.");
         }
-        //Проверка количества
-        if (availableCopies <= 0) {
-            if (availableCopies < 0) {
-                throw new IllegalArgumentException("Количество копий не может быть отрицательным.");
-            } else {
-                throw new NoAvailableCopiesException(title);
-            }
-        }
 
-        this.title = t;
-        this.author = a;
-        this.availableCopies = availableCopies;
+        // Проверка количества копий
+        if (availableCopies <= 0) {
+            throw new InvalidBookCopiesException(title);
+        }
     }
 
     //Геттеры

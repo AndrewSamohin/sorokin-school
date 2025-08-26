@@ -7,18 +7,19 @@ public class Library {
     private final List<Book> catalog = new ArrayList<>();
 
     //Добавление новой книги в каталог
-    public void addBook(String title, String author, int availableCopies) {
+    public void addBook(Book book) {
         //Провераяем, есть ли уже такая книга
         for (Book b : catalog) {
-            if (b.getTitle().equalsIgnoreCase(title) && b.getAuthor().equalsIgnoreCase(author)) {
-                int newCopies = b.getAvailableCopies() + availableCopies;
+            if (b.getTitle().equalsIgnoreCase(book.getTitle())
+                && b.getAuthor().equalsIgnoreCase(book.getAuthor())) {
+                int newCopies = b.getAvailableCopies() + book.getAvailableCopies();
                 b.setAvailableCopies(newCopies);
                 return;
             }
         }
 
         //Если нет книги, добавляем новую
-        Book newBook = new Book(title, author, availableCopies);
+        Book newBook = new Book(book.getTitle(), book.getAuthor(), book.getAvailableCopies());
         catalog.add(newBook);
     }
 

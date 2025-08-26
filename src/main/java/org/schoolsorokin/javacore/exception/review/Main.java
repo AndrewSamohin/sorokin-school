@@ -28,7 +28,7 @@ public class Main {
                     returnTheBook();
                     break;
                 case 5:
-                    System.out.println("<UNK> <UNK> <UNK>: ");
+                    System.out.println("Выходи из приложения.");
                     flag = false;
                     break;
                 default:
@@ -72,11 +72,12 @@ public class Main {
             System.out.println("Введите количество копий: ");
             int availableCopies = Integer.parseInt(sc.nextLine());
 
-            lib.addBook(title, author, availableCopies);
+            Book book = new Book(title, author, availableCopies);
+            lib.addBook(book);
             System.out.println("Книга успешна добавлена в каталог!");
         } catch (NumberFormatException e) {
-            System.out.println("Ошибка: Количество копий должно быть числом.");
-        } catch (IllegalArgumentException e) {
+            System.out.println("Ошибка: Количество копий должно быть положительным числом.");
+        } catch (IllegalArgumentException | InvalidBookCopiesException e) {
             System.out.println("Ошибка: " + e.getMessage());
         }
     }
