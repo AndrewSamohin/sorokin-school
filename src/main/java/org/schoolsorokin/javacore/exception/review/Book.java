@@ -8,21 +8,13 @@ public class Book {
     private int availableCopies;
 
     public Book(String title, String author, int availableCopies) {
-        checkBook();
-
-        this.title = title;
-        this.author = author;
-        this.availableCopies = availableCopies;
-    }
-
-    private void checkBook() {
         //Проверка title
-        if (ObjectUtils.isEmpty((title != null) ? title.trim() : null)) {
+        if (ObjectUtils.isEmpty(title)) {
             throw new IllegalArgumentException("Название не может быть пустым.");
         }
 
         //Проверка author
-        if (ObjectUtils.isEmpty((author != null) ? author.trim() : null)) {
+        if (ObjectUtils.isEmpty(author)) {
             throw new IllegalArgumentException("Автор не может быть пустым.");
         }
 
@@ -30,6 +22,10 @@ public class Book {
         if (availableCopies <= 0) {
             throw new InvalidBookCopiesException(title);
         }
+
+        this.title = title;
+        this.author = author;
+        this.availableCopies = availableCopies;
     }
 
     //Геттеры

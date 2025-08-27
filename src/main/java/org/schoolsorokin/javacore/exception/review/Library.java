@@ -19,8 +19,7 @@ public class Library {
         }
 
         //Если нет книги, добавляем новую
-        Book newBook = new Book(book.getTitle(), book.getAuthor(), book.getAvailableCopies());
-        catalog.add(newBook);
+        catalog.add(book);
     }
 
     //Выдаем книгу
