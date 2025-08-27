@@ -19,9 +19,9 @@ public class App
         arrays.arrays();
 
         WorkingWithStrings strings = new WorkingWithStrings();
-        strings.strings();*/
+        strings.strings();
 
         ContactAccountingSystem system = new ContactAccountingSystem();
-        system.accountSystem();
+        system.accountSystem();*/
     }
 }
