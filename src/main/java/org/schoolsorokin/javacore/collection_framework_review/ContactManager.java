@@ -48,15 +48,26 @@ public class ContactManager {
             System.out.println("Контактов нет.");
             return;
         }
-        //Проходим по Map
-        for (String group : contactMap.keySet()) {
-            List<Contact> groupContacts = contactMap.get(group);
-            if (groupContacts != null && !groupContacts.isEmpty()) {
-                System.out.println("Контакты в группе: " + group);
-                for (Contact contact : groupContacts) {
-                    System.out.println(contact); // toString() без группы
+        //Set для уже выведенных групп
+        Set<String> withdrawnGroups = new HashSet<>();
+        Iterator<Contact> iterator = contactList.iterator();
+
+        //Проходим по контактам
+        while (iterator.hasNext()) {
+            Contact contact = iterator.next();
+            String group = contact.getGroup();
+
+            //Если группа не найдена
+            if (!withdrawnGroups.contains(group)) {
+                System.out.println("Контакты в группе " + group + ": ");
+
+                for (Contact con :  contactList) {
+                    if (con.getGroup().equals(group)) {
+                        System.out.println(con);
+                    }
                 }
-                System.out.println(); // пустая строка для разделения групп
+                System.out.println();
+                withdrawnGroups.add(group);
             }
         }
     }
@@ -86,7 +97,7 @@ public class ContactManager {
 
         // Проверяем, что группа существует и в ней есть контакты
         if (groupContacts != null && !groupContacts.isEmpty()) {
-            System.out.println("Контакты в группе: " + group);
+            System.out.println("Контакты в группе " + group + ": ");
             for (Contact contact : groupContacts) {
                 System.out.println(contact);
             }
