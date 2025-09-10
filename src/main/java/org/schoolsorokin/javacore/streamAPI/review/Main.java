@@ -118,8 +118,10 @@ public class Main {
 
         //Задание 1
         System.out.println("Задание 1");
-        List<Product> listBooks = products.stream()
-                .filter(category -> category.getCategory().equals("Книги")) //Только книги
+        List<Product> listBooks = customers.stream()
+                .flatMap(customer -> customer.getOrders().stream())
+                .flatMap(order -> order.getProducts().stream())
+                .filter(product -> product.getCategory().equals("Книги")) //Только книги
                 .filter(price ->  price.getPrice().compareTo(new BigDecimal("100")) > 0) //Книги должны быть больше 100
                 .collect(Collectors.toList());
 
