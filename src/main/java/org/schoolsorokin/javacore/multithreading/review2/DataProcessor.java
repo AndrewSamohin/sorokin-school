@@ -11,12 +11,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class DataProcessor {
     private final ExecutorService executorService;
-    private final AtomicInteger counterTasks = new AtomicInteger(0);//Счетчик задач
-    private final AtomicInteger activeTasks = new AtomicInteger(0);//Количество активных задач
-    private final Map<String, Integer> results = new HashMap<>();
+    private final AtomicInteger counterTasks;//Счетчик задач
+    private final AtomicInteger activeTasks;//Количество активных задач
+    private final Map<String, Integer> results;
     //Конструктор для управления количества поток
     public DataProcessor(int poolSize) {
         this.executorService = Executors.newFixedThreadPool(poolSize);
+        this.counterTasks = new AtomicInteger(0);
+        this.activeTasks = new AtomicInteger(0);
+        this.results = new HashMap<>();
     }
     //Добавляем новую задачу
     public String submitTask(List<Integer> numbers) {
@@ -48,11 +51,8 @@ public class DataProcessor {
     //Получение результата
     public Optional<Integer> getResult(String taskName) {
         synchronized (results) {
-            if (results.containsKey(taskName)) {
-                return Optional.of(results.get(taskName));
-            }
+            return Optional.ofNullable(results.get(taskName));
         }
-        return Optional.empty();
     }
     //Завершение задачи
     public void shutdown() {
