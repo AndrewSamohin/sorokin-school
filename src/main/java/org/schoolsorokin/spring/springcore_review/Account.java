@@ -1,12 +1,14 @@
 package org.schoolsorokin.spring.springcore_review;
 
+import java.math.BigDecimal;
+
 public class Account {
 
     private final int accountId;
     private final int userId;
-    private int defaultAmount;
+    private BigDecimal defaultAmount;
 
-    public Account(int accountId, int userId, int defaultAmount) {
+    public Account(int accountId, int userId, BigDecimal defaultAmount) {
         this.accountId = accountId;
         this.userId = userId;
         this.defaultAmount = defaultAmount;
@@ -20,11 +22,11 @@ public class Account {
         return userId;
     }
 
-    public int getDefaultAmount() {
+    public BigDecimal getDefaultAmount() {
         return defaultAmount;
     }
 
-    public void setDefaultAmount(int defaultAmount) {
+    public void setDefaultAmount(BigDecimal defaultAmount) {
         this.defaultAmount = defaultAmount;
     }
 

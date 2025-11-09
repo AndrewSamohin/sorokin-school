@@ -7,5 +7,5 @@ public enum ConsoleOperationType {
     ACCOUNT_CLOSE,
     ACCOUNT_WITHDRAW,
     ACCOUNT_DEPOSIT,
-    ACCOUNT_TRANSFER,
+    ACCOUNT_TRANSFER
 }
