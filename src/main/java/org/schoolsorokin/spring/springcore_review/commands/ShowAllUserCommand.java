@@ -8,7 +8,11 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.logging.Logger;
 
-//Отображение списка всех пользователей.
+/**
+ * Отображение списка всех пользователей.
+ * @since 10.11.2025
+ * @author Samohin Andrew
+ */
 @Component
 public class ShowAllUserCommand implements OperationCommand {
 

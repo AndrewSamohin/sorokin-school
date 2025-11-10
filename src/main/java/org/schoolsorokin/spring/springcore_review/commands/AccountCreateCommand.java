@@ -9,7 +9,11 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
-//Создание нового счета для пользователя.
+/**
+ * Создание нового счета для пользователя.
+ * @since 10.11.2025
+ * @author Samohin Andrew
+ */
 @Component
 public class AccountCreateCommand implements OperationCommand {
 

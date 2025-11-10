@@ -10,7 +10,11 @@ import org.springframework.stereotype.Component;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
-//Создание нового пользователя.
+/**
+ * Создание нового пользователя.
+ * @since 10.11.2025
+ * @author Samohin Andrew
+ */
 @Component
 public class UserCreateCommand implements OperationCommand {
 

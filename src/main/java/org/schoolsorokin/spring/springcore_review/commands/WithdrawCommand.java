@@ -8,7 +8,12 @@ import java.math.BigDecimal;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
-//Запрашивает ID счета и сумму. Снимает указанную сумму со счета.
+/**
+ * Запрашивает ID счета и сумму.
+ * Снимает указанную сумму со счета.
+ * @since 10.11.2025
+ * @author Samohin Andrew
+ */
 @Component
 public class WithdrawCommand implements OperationCommand {
 

@@ -7,7 +7,11 @@ import org.springframework.stereotype.Component;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
-//Закрытие счета.
+/**
+ * Закрытие счета.
+ * @since 10.11.2025
+ * @author Samohin Andrew
+ */
 @Component
 public class CloseCommand implements OperationCommand {
 

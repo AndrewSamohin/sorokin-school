@@ -8,6 +8,11 @@ import java.math.BigDecimal;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
+/**
+ * Пополнение счета.
+ * @since 10.11.2025
+ * @author Samohin Andrew
+ */
 @Component
 public class DepositCommand implements OperationCommand{
 
