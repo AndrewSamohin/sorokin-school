@@ -24,7 +24,7 @@ public class OutputCommands {
     public void AccountCrateOutPut(Account account) {
         System.out.println("New account created with ID: "
                 + account.getAccountId()
-                + " for user: " + account.getUserId());
+                + " for user: " + account.getUser().getUserId());
     }
 
     public void AccountCloseOutPut(int accountId) {

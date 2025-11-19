@@ -1,25 +1,43 @@
 package org.schoolsorokin.spring.springcore_review;
 
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 
+@Entity
+@Table(name = "accounts")
 public class Account {
 
-    private final int accountId;
-    private final int userId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int accountId;
+
+    @Column(name = "amount")
     private BigDecimal defaultAmount;
 
-    public Account(int accountId, int userId, BigDecimal defaultAmount) {
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    public Account(int accountId, BigDecimal defaultAmount) {
         this.accountId = accountId;
-        this.userId = userId;
         this.defaultAmount = defaultAmount;
+    }
+
+    public Account() {
+
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public int getAccountId() {
         return accountId;
-    }
-
-    public int getUserId() {
-        return userId;
     }
 
     public BigDecimal getDefaultAmount() {
@@ -34,7 +52,7 @@ public class Account {
     public String toString() {
         return "Account{" +
                 "id=" + accountId +
-                ", userId=" + userId +
+                ", userId=" + user.getUserId() +
                 ", moneyAmount=" + defaultAmount +
                 '}';
     }

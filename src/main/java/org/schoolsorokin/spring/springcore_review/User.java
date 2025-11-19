@@ -1,12 +1,22 @@
 package org.schoolsorokin.spring.springcore_review;
 
+import jakarta.persistence.*;
+
 import java.util.List;
 
+@Entity
+@Table(name = "users")
 public class User {
 
-    private final int userId;
-    private final String login;
-    private final List<Account> accountList;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int userId;
+
+    @Column(name = "login")
+    private String login;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    private List<Account> accountList;
 
     public User(
             int userId,
@@ -16,6 +26,14 @@ public class User {
         this.userId = userId;
         this.login = login;
         this.accountList = accountList;
+    }
+
+    public User() {
+
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
     }
 
     public int getUserId() {
