@@ -1,35 +1,40 @@
 package org.schoolsorokin.spring.springcore_review.service;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.schoolsorokin.spring.springcore_review.Account;
 import org.schoolsorokin.spring.springcore_review.AccountProperties;
+import org.schoolsorokin.spring.springcore_review.TransactionHelper;
 import org.schoolsorokin.spring.springcore_review.User;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
 @Service
 public class AccountService {
 
-    private int idCounter = 0;
-    private final List<Account> accounts = new ArrayList<>();
     private final UserService userService;
     private final AccountProperties accountProperties;
     private final Logger log = Logger.getLogger(AccountService.class.getName());
 
+    private final SessionFactory sessionFactory;
+    private final TransactionHelper transactionHelper;
+
     public AccountService(
             UserService userService,
-            AccountProperties accountProperties
-    ) {
+            AccountProperties accountProperties,
+            SessionFactory sessionFactory,
+            TransactionHelper transactionHelper) {
         this.userService = userService;
         this.accountProperties = accountProperties;
+        this.sessionFactory = sessionFactory;
+        this.transactionHelper = transactionHelper;
     }
 
     //Создание счета
-    public Account createAccount(int userId) {
+    public Account createAccount(Long userId) {
         log.info("Attempting to create account for user ID: " + userId);
 
         User user = userService.searchUser(userId)
@@ -39,17 +44,20 @@ public class AccountService {
                             "User with ID " + userId + " not found.");
                 });
 
-        idCounter++;
-        BigDecimal defaultAmount = BigDecimal.valueOf(
-                accountProperties.getDefaultAmount());
-        Account account = new Account(idCounter, user.getUserId(), defaultAmount);
+        Account account = new Account();
+        account.setUser(user);
+        account.setDefaultAmount(
+                BigDecimal.valueOf(accountProperties.getDefaultAmount())
+        );
 
-        user.getAccountList().add(account);
-        accounts.add(account);
+        transactionHelper.executeInTransactionVoid(session -> {
+            session.persist(account);
+            user.getAccountList().add(account);
+        });
 
         log.info("Created account ID: " + account.getAccountId()
                 + ", for user '" + user.getLogin()
-                + "' with default amount: " + defaultAmount);
+                + "' with default amount: " + account.getDefaultAmount());
 
         return account;
     }
@@ -58,11 +66,22 @@ public class AccountService {
     public void deposit(int accountId, BigDecimal amount) {
         log.info("Attempting to deposit " + amount + " to account ID: " + accountId);
 
-        Account account = findById(accountId);
+        // Проверка корректности суммы
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            log.warning("Deposit failed: amount must be positive. Provided: " + amount);
+            throw new IllegalArgumentException("Deposit amount must be positive.");
+        }
 
-        account.setDefaultAmount(account.getDefaultAmount().add(amount));
+        transactionHelper.executeInTransactionVoid(session -> {
+            Account account = session.find(Account.class, accountId);
+            if (account == null)
+                throw new IllegalArgumentException("Account not found");
+
+            account.setDefaultAmount(account.getDefaultAmount().add(amount));
+        });
+
         log.info("Deposit successful. New balance for account ID: "
-                + accountId + ": " + account.getDefaultAmount());
+                + accountId + ": " + amount);
     }
 
     //Снятие средств со счета
@@ -74,18 +93,24 @@ public class AccountService {
             throw new IllegalArgumentException("Withdraw amount must be positive.");
         }
 
-        Account account = findById(accountId);
-        if (account.getDefaultAmount().compareTo(amount) < 0) {
-            log.warning("Not enough funds on account ID: " + accountId
-                    + ". Current balance: " + account.getDefaultAmount());
-            throw new IllegalArgumentException(
-                    "Not enough funds on account: id=" + accountId +
-                    ", current balance=" + account.getDefaultAmount());
-        }
+        transactionHelper.executeInTransactionVoid(session -> {
+            Account account = session.find(Account.class, accountId);
+            if (account == null) {
+                throw new IllegalArgumentException("Account with id " + accountId + " not found");
+            }
 
-        account.setDefaultAmount(account.getDefaultAmount().subtract(amount));
-        log.info("Withdraw successful. New balance for account ID: "
-                + accountId + ": " + account.getDefaultAmount());
+            if (account.getDefaultAmount().compareTo(amount) < 0) {
+                log.warning("Not enough funds on account ID: " + accountId
+                        + ". Current balance: " + account.getDefaultAmount());
+                throw new IllegalArgumentException(
+                        "Not enough funds on account: id=" + accountId +
+                                ", current balance=" + account.getDefaultAmount());
+            }
+
+            account.setDefaultAmount(account.getDefaultAmount().subtract(amount));
+            log.info("Withdraw successful. New balance for account ID: "
+                    + accountId + ": " + account.getDefaultAmount());
+        });
     }
 
     //Перевод средств между счетами
@@ -99,93 +124,107 @@ public class AccountService {
             throw new IllegalArgumentException("Transfer amount must be positive.");
         }
 
-        Account fromAccount = findById(fromAccountId);
-        Account toAccount = findById(toAccountId);
+        transactionHelper.executeInTransactionVoid(session -> {
+            Account fromAccount = session.find(Account.class, fromAccountId);
+            Account toAccount = session.find(Account.class, toAccountId);
+            if (toAccount == null || fromAccount == null) {
+                throw new IllegalArgumentException("Account with id not found");
+            }
 
-        if (fromAccount.getDefaultAmount().compareTo(amount) < 0) {
-            log.warning("Not enough funds on account ID: " + fromAccountId
-                    + ". Current balance: " + fromAccount.getDefaultAmount());
-            throw new IllegalArgumentException("Not enough funds on account " + fromAccountId);
-        }
+            if (fromAccountId == toAccountId) {
+                throw new IllegalArgumentException("Cannot transfer to the same account");
+            }
 
-        //Списываем средства
-        fromAccount.setDefaultAmount(fromAccount.getDefaultAmount().subtract(amount));
+            if (fromAccount.getDefaultAmount().compareTo(amount) < 0) {
+                log.warning("Not enough funds on account ID: " + fromAccountId
+                        + ". Current balance: " + fromAccount.getDefaultAmount());
+                throw new IllegalArgumentException("Not enough funds on account " + fromAccountId);
+            }
 
-        //Если разные пользователи принимаем комиссию
-        if (fromAccount.getUserId() != toAccount.getUserId()) {
-            BigDecimal commission = BigDecimal.valueOf(
-                    accountProperties.getTransferCommission());
-            BigDecimal afterCommission = amount.multiply(
-                    BigDecimal.ONE.subtract(commission));
+            //Списываем средства
+            fromAccount.setDefaultAmount(fromAccount.getDefaultAmount().subtract(amount));
 
-            toAccount.setDefaultAmount(toAccount.getDefaultAmount().add(afterCommission));
+            //Если разные пользователи принимаем комиссию
+            if (fromAccount.getUser().getUserId() != toAccount.getUser().getUserId()) {
+                BigDecimal commission = BigDecimal.valueOf(
+                        accountProperties.getTransferCommission());
+                BigDecimal afterCommission = amount.multiply(
+                        BigDecimal.ONE.subtract(commission));
 
-            log.info("Transfer completed with commission. "
-                    + "Sent: " + amount
-                    + ", received: " + afterCommission
-                    + ", commission: " + amount.subtract(afterCommission));
-        } else  {
-            toAccount.setDefaultAmount(toAccount.getDefaultAmount().add(amount));
-            log.info("Transfer completed (no commission). Amount: " + amount);
-        }
+                toAccount.setDefaultAmount(toAccount.getDefaultAmount().add(afterCommission));
 
-        log.info("New balances: FromAccount: " + fromAccount.getDefaultAmount()
-                + ", ToAccount: " + toAccount.getDefaultAmount());
+                log.info("Transfer completed with commission. "
+                        + "Sent: " + amount
+                        + ", received: " + afterCommission
+                        + ", commission: " + amount.subtract(afterCommission));
+            } else  {
+                toAccount.setDefaultAmount(toAccount.getDefaultAmount().add(amount));
+                log.info("Transfer completed (no commission). Amount: " + amount);
+            }
+
+            log.info("New balances: FromAccount: " + fromAccount.getDefaultAmount()
+                    + ", ToAccount: " + toAccount.getDefaultAmount());
+
+            throw new RuntimeException("Test exception: transaction must be rolled back");
+        });
     }
 
     //Закрытие счета
     public void closeAccount(int accountId) {
         log.info("Attempting to close account ID: " + accountId);
 
-        Account account = findById(accountId);
-        User user = userService.searchUser(account.getUserId())
-                .orElseThrow(() -> {
-                    log.warning("User not found for account ID " + accountId);
-                    return new IllegalArgumentException(
-                            "User not found for account ID " + accountId);
-                });
+        transactionHelper.executeInTransactionVoid(session -> {
+            Account account = session.find(Account.class, accountId);
+            User user = account.getUser();
 
-        List<Account> accountList = user.getAccountList();
+            if (user == null) {
+                log.warning("User not found for account ID " + accountId);
+                throw new IllegalArgumentException("User not found for account ID " + accountId);
+            }
 
-        if (accountList.size() <= 1) {
-            log.warning("Cannot close the only account of user: " + user.getLogin());
-            throw new IllegalArgumentException(
-                    "Cannot close the only account of user: " + user.getLogin()
-            );
-        }
+            if (user.getAccountList().size() <= 1) {
+                log.warning("Cannot close the only account of user: " + user.getLogin());
+                throw new IllegalArgumentException(
+                        "Cannot close the only account of user: " + user.getLogin()
+                );
+            }
 
-        //Выбираем другой счет для перевода остатка
-        Account target = accountList.stream()
-                .filter(acc -> acc.getAccountId() != accountId)
-                .findFirst()
-                .orElseThrow(() -> {
-                    log.warning("No alternative account found for transferring funds.");
-                    return new IllegalArgumentException("No alternative account found.");
-                });
+            //Выбираем другой счет для перевода остатка
+            Account target = user.getAccountList().stream()
+                    .filter(acc -> acc.getAccountId() != accountId)
+                    .findFirst()
+                    .orElseThrow(() -> {
+                        log.warning("No alternative account found for transferring funds.");
+                        return new IllegalArgumentException("No alternative account found.");
+                    });
 
-        BigDecimal balance = account.getDefaultAmount();
-        if (balance.compareTo(BigDecimal.ZERO) > 0) {
-            target.setDefaultAmount(target.getDefaultAmount().add(balance));
-            log.info("Transferred remaining balance '"
-                    + balance + "' to account ID="
-                    + target.getAccountId());
-        }
+            if (account.getDefaultAmount().compareTo(BigDecimal.ZERO) > 0) {
+                target.setDefaultAmount(target
+                        .getDefaultAmount()
+                        .add(account.getDefaultAmount()));
+                log.info("Transferred remaining balance to account ID="
+                        + target.getAccountId());
+            }
 
-        accountList.remove(account);
-        accounts.remove(account);
-        log.info("Account ID: " + accountId + ", successfully closed.");
+            user.getAccountList().remove(account);
+            account.setUser(null);
+            session.remove(account);
+            log.info("Account ID: " + accountId + ", successfully closed.");
+        });
     }
 
     //Найти счет по ID
     public Account findById(int accountId) {
-        return accounts.stream()
-                .filter(account -> account.getAccountId() == accountId)
-                .findFirst()
-                .orElseThrow(() -> {
-                    log.warning("Account not found with ID: " + accountId);
-                    return new IllegalArgumentException(
-                            "Account not found with id: " + accountId
-                    );
-                });
+        try (Session session = sessionFactory.openSession()) {
+
+            Account acc = session.find(Account.class, accountId);
+
+            if (acc == null) {
+                log.warning("Account not found with ID: " + accountId);
+                throw new IllegalArgumentException("Account not found with ID: " + accountId);
+            }
+
+            return acc;
+        }
     }
 }
