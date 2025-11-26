@@ -26,7 +26,7 @@ public class TransactionHelper {
 
     public<T> T executeInTransaction(Function<Session, T> action) {
         Transaction transaction = null;
-        try (Session session = sessionFactory.openSession();) {
+        try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
 
             T result = action.apply(session);

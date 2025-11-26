@@ -1,6 +1,5 @@
 package org.schoolsorokin.spring.springcore_review.service;
 
-import jakarta.transaction.TransactionManager;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.schoolsorokin.spring.springcore_review.Account;
@@ -10,7 +9,6 @@ import org.schoolsorokin.spring.springcore_review.User;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
@@ -36,7 +34,7 @@ public class AccountService {
     }
 
     //Создание счета
-    public Account createAccount(int userId) {
+    public Account createAccount(Long userId) {
         log.info("Attempting to create account for user ID: " + userId);
 
         User user = userService.searchUser(userId)
@@ -68,6 +66,12 @@ public class AccountService {
     public void deposit(int accountId, BigDecimal amount) {
         log.info("Attempting to deposit " + amount + " to account ID: " + accountId);
 
+        // Проверка корректности суммы
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            log.warning("Deposit failed: amount must be positive. Provided: " + amount);
+            throw new IllegalArgumentException("Deposit amount must be positive.");
+        }
+
         transactionHelper.executeInTransactionVoid(session -> {
             Account account = session.find(Account.class, accountId);
             if (account == null)
@@ -91,6 +95,9 @@ public class AccountService {
 
         transactionHelper.executeInTransactionVoid(session -> {
             Account account = session.find(Account.class, accountId);
+            if (account == null) {
+                throw new IllegalArgumentException("Account with id " + accountId + " not found");
+            }
 
             if (account.getDefaultAmount().compareTo(amount) < 0) {
                 log.warning("Not enough funds on account ID: " + accountId
@@ -120,6 +127,9 @@ public class AccountService {
         transactionHelper.executeInTransactionVoid(session -> {
             Account fromAccount = session.find(Account.class, fromAccountId);
             Account toAccount = session.find(Account.class, toAccountId);
+            if (toAccount == null || fromAccount == null) {
+                throw new IllegalArgumentException("Account with id not found");
+            }
 
             if (fromAccountId == toAccountId) {
                 throw new IllegalArgumentException("Cannot transfer to the same account");
@@ -154,6 +164,8 @@ public class AccountService {
 
             log.info("New balances: FromAccount: " + fromAccount.getDefaultAmount()
                     + ", ToAccount: " + toAccount.getDefaultAmount());
+
+            throw new RuntimeException("Test exception: transaction must be rolled back");
         });
     }
 
@@ -194,6 +206,8 @@ public class AccountService {
                         + target.getAccountId());
             }
 
+            user.getAccountList().remove(account);
+            account.setUser(null);
             session.remove(account);
             log.info("Account ID: " + accountId + ", successfully closed.");
         });
@@ -201,13 +215,16 @@ public class AccountService {
 
     //Найти счет по ID
     public Account findById(int accountId) {
-        return transactionHelper.executeInTransaction(session -> {
+        try (Session session = sessionFactory.openSession()) {
+
             Account acc = session.find(Account.class, accountId);
+
             if (acc == null) {
                 log.warning("Account not found with ID: " + accountId);
                 throw new IllegalArgumentException("Account not found with ID: " + accountId);
             }
+
             return acc;
-        });
+        }
     }
 }

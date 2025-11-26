@@ -17,14 +17,7 @@ public class HibernateConfiguration {
                 .addAnnotatedClass(User.class)
                 .addAnnotatedClass(Account.class)
                 .addAnnotatedClass(UserService.class)
-                .addAnnotatedClass(AccountService.class)
-                .addPackage("org.hibernate")
-                .setProperty("hibernate.connection.driver_class", "org.postgresql.Driver")
-                .setProperty("hibernate.connection.url", "jdbc:postgresql://localhost:5432/postgres")
-                .setProperty("hibernate.connection.username", "postgres")
-                .setProperty("hibernate.connection.password", "postgres")
-                .setProperty("hibernate.show_sql", "true")
-                .setProperty("hibernate.hbm2ddl.auto", "update");
+                .addAnnotatedClass(AccountService.class);
 
         return configuration.buildSessionFactory();
     }

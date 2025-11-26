@@ -2,11 +2,10 @@ package org.schoolsorokin.spring.springcore_review.service;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.schoolsorokin.spring.springcore_review.User;
 import org.schoolsorokin.spring.springcore_review.TransactionHelper;
+import org.schoolsorokin.spring.springcore_review.User;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -14,7 +13,6 @@ import java.util.logging.Logger;
 @Service
 public class UserService {
 
-    private final List<User> users = new ArrayList<>();
     private static final Logger log = Logger.getLogger(UserService.class.getName());
 
     private final SessionFactory sessionFactory;
@@ -60,19 +58,18 @@ public class UserService {
     }
 
     //Поиск пользователя по ID
-    public Optional<User> searchUser(int userId) {
+    public Optional<User> searchUser(Long userId) {
         log.info("Searching for user with ID: " + userId);
 
-        return Optional.ofNullable(
-                transactionHelper.executeInTransaction(
-                        session -> session.find(User.class, userId)
-                )
-        );
+        try (Session session = sessionFactory.openSession()) {
+            User user = session.find(User.class, userId);
+            return Optional.ofNullable(user);
+        }
     }
 
     //Получение списка всех пользователей
     public List<User> getAllUsers() {
-        log.info("Retrieving all users. Total count: " + users.size());
+        log.info("Retrieving all users.");
 
         return transactionHelper.executeInTransaction(
                 session -> session.createQuery("FROM User", User.class).list()

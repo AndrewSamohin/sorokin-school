@@ -10,7 +10,7 @@ public class Account {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int accountId;
+    private Long accountId;
 
     @Column(name = "amount")
     private BigDecimal defaultAmount;
@@ -19,7 +19,7 @@ public class Account {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Account(int accountId, BigDecimal defaultAmount) {
+    public Account(Long accountId, BigDecimal defaultAmount) {
         this.accountId = accountId;
         this.defaultAmount = defaultAmount;
     }
@@ -36,7 +36,7 @@ public class Account {
         this.user = user;
     }
 
-    public int getAccountId() {
+    public Long getAccountId() {
         return accountId;
     }
 
